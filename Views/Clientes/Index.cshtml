@@ -1,0 +1,22 @@
+@model IEnumerable<FerreteriaValdivia.Models.Cliente>
+@{ ViewData["Title"] = "Clientes"; }
+<div class="container mt-4">
+    <h2>Tabla de Clientes</h2>
+    <a asp-action="Crear" class="btn btn-primary mb-3">Agregar Nuevo Cliente</a>
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>Teléfono</th><th>Email</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model) {
+                <tr>
+                    <td>@c.Id</td><td>@c.Nombre</td><td>@c.Apellido</td><td>@c.Telefono</td><td>@c.Email</td>
+                    <td>
+                        <a asp-action="Editar" asp-route-id="@c.Id" class="btn btn-warning btn-sm">Editar</a>
+                        <a asp-action="Eliminar" asp-route-id="@c.Id" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar cliente?');">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
