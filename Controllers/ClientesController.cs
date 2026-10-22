@@ -1,74 +1,85 @@
 using Microsoft.AspNetCore.Mvc;
+using FerreteriaValdivia.Data;
 using FerreteriaValdivia.Models;
 
 namespace FerreteriaValdivia.Controllers
 {
     public class ClientesController : Controller
     {
-        
-        private static List<Cliente> clientes = new List<Cliente>
+        private readonly AppDbContext _context;
+
+        // Inyección de dependencias de la base de datos
+        public ClientesController(AppDbContext context)
         {
-            new Cliente { Id = 1, Nombre = "Juan", Apellido = "Pérez", Telefono = "70012345", Email = "juan@gmail.com" },
-            new Cliente { Id = 2, Nombre = "María", Apellido = "Gómez", Telefono = "70054321", Email = "maria@gmail.com" }
-        };
+            _context = context;
+        }
 
-        public IActionResult Index() => View(clientes);
+        // Listar todos los clientes desde MariaDB
+        public IActionResult Index()
+        {
+            var clientes = _context.Clientes.ToList();
+            return View(clientes);
+        }
 
+        // Mostrar formulario para crear cliente
         public IActionResult Crear() => View();
 
+        // Guardar nuevo cliente en MariaDB
         [HttpPost]
         public IActionResult Crear(Cliente cliente)
         {
-            cliente.Id = clientes.Count > 0 ? clientes.Max(c => c.Id) + 1 : 1;
-            clientes.Add(cliente);
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                _context.Clientes.Add(cliente);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(cliente);
         }
 
+        // Mostrar formulario para editar cliente
         public IActionResult Editar(int id)
         {
-            var cliente = clientes.FirstOrDefault(c => c.Id == id);
+            var cliente = _context.Clientes.Find(id);
             if (cliente == null) return NotFound();
             return View(cliente);
         }
 
+        // Guardar cambios del cliente editado
         [HttpPost]
         public IActionResult Editar(Cliente cliente)
         {
-            var existente = clientes.FirstOrDefault(c => c.Id == cliente.Id);
-            if (existente != null)
+            if (ModelState.IsValid)
             {
-                existente.Nombre = cliente.Nombre;
-                existente.Apellido = cliente.Apellido;
-                existente.Telefono = cliente.Telefono;
-                existente.Email = cliente.Email;
+                _context.Clientes.Update(cliente);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(cliente);
+        }
+
+        // Eliminar un cliente por ID
+        public IActionResult Eliminar(int id)
+        {
+            var cliente = _context.Clientes.Find(id);
+            if (cliente != null)
+            {
+                _context.Clientes.Remove(cliente);
+                _context.SaveChanges();
             }
             return RedirectToAction("Index");
         }
 
-        public IActionResult Eliminar(int id)
-        {
-            var cliente = clientes.FirstOrDefault(c => c.Id == id);
-            if (cliente != null) clientes.Remove(cliente);
-            return RedirectToAction("Index");
-        }
-
-        public IActionResult Buscar(string texto)
-        {
-            if (string.IsNullOrEmpty(texto)) return View(clientes);
-            var resultados = clientes.Where(c => 
-                c.Nombre.Contains(texto, StringComparison.OrdinalIgnoreCase) || 
-                c.Apellido.Contains(texto, StringComparison.OrdinalIgnoreCase)).ToList();
-            return View(resultados);
-        }
-
+        // Pestaña "Actualizar" del menú superior
         public IActionResult Actualizar()
         {
-            return View("Index", clientes);
+            return View("Index", _context.Clientes.ToList());
         }
 
+        // Pestaña "Eliminar" del menú superior
         public IActionResult EliminarPagina()
         {
-            return View("Index", clientes);
+            return View("Index", _context.Clientes.ToList());
         }
     }
 }

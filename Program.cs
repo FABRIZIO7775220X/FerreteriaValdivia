@@ -1,4 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using FerreteriaValdivia.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Configurar la conexión a MariaDB indicando la versión explícitamente
+var connectionString = builder.Configuration.GetConnectionString("CadenaConexion");
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(10, 4, 32))));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -14,16 +22,14 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
