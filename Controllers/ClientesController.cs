@@ -5,7 +5,7 @@ namespace FerreteriaValdivia.Controllers
 {
     public class ClientesController : Controller
     {
-        // Lista temporal en memoria
+        
         private static List<Cliente> clientes = new List<Cliente>
         {
             new Cliente { Id = 1, Nombre = "Juan", Apellido = "Pérez", Telefono = "70012345", Email = "juan@gmail.com" },
@@ -59,6 +59,16 @@ namespace FerreteriaValdivia.Controllers
                 c.Nombre.Contains(texto, StringComparison.OrdinalIgnoreCase) || 
                 c.Apellido.Contains(texto, StringComparison.OrdinalIgnoreCase)).ToList();
             return View(resultados);
+        }
+
+        public IActionResult Actualizar()
+        {
+            return View("Index", clientes);
+        }
+
+        public IActionResult EliminarPagina()
+        {
+            return View("Index", clientes);
         }
     }
 }
