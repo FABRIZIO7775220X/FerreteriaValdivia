@@ -1,16 +1,20 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using FerreteriaValdivia.Models;
+using FerreteriaValdivia.Data; // Importante para reconocer AppDbContext
 
 namespace FerreteriaValdivia.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly AppDbContext _context;
 
-    public HomeController(ILogger<HomeController> logger)
+    // Se reciben tanto logger como context en el constructor
+    public HomeController(ILogger<HomeController> logger, AppDbContext context)
     {
         _logger = logger;
+        _context = context;
     }
 
     public IActionResult Index()
@@ -27,5 +31,11 @@ public class HomeController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    public IActionResult Dashboard()
+    {
+        ViewBag.TotalClientes = _context.Clientes.Count();
+        return View();
     }
 }
