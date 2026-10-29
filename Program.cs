@@ -1,8 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using FerreteriaValdivia.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+var connectionString = builder.Configuration.GetConnectionString("ConexionMariaDB");
+builder.Services.AddDbContext<AplicationDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
